@@ -1,31 +1,36 @@
 import express from "express";
 import cors from "cors";
-import mercadopago from "mercadopago";
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN,
+// 🔑 CONFIG NOVA DO MERCADO PAGO
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
 });
 
+const preference = new Preference(client);
+
+// Criar pagamento
 app.post("/create_preference", async (req, res) => {
   try {
-    const preference = {
+    const body = {
       items: [
         {
           title: "Pedido Espetinho",
           quantity: 1,
           unit_price: 10,
+          currency_id: "BRL",
         },
       ],
     };
 
-    const response = await mercadopago.preferences.create(preference);
+    const response = await preference.create({ body });
 
     res.json({
-      id: response.body.id,
+      id: response.id,
     });
   } catch (error) {
     console.log(error);
