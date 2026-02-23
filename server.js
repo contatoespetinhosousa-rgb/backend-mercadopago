@@ -1,43 +1,40 @@
-const express = require("express");
-const mercadopago = require("mercadopago");
-const cors = require("cors");
+import express from "express";
+import cors from "cors";
+import mercadopago from "mercadopago";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 mercadopago.configure({
-  access_token: "COLE_AQUI_SEU_ACCESS_TOKEN_TESTE"
+  access_token: process.env.MP_ACCESS_TOKEN,
 });
 
-app.post("/criar-pagamento", async (req, res) => {
+app.post("/create_preference", async (req, res) => {
   try {
-    const { items, deliveryFee } = req.body;
-
     const preference = {
-      items: items.map(item => ({
-        title: item.nome,
-        quantity: item.quantidade,
-        unit_price: item.preco,
-        currency_id: "BRL"
-      })),
-      shipments: {
-        cost: deliveryFee,
-        mode: "not_specified"
-      }
+      items: [
+        {
+          title: "Pedido Espetinho",
+          quantity: 1,
+          unit_price: 10,
+        },
+      ],
     };
 
     const response = await mercadopago.preferences.create(preference);
-    res.json({ linkPagamento: response.body.init_point });
 
+    res.json({
+      id: response.body.id,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send("Erro ao criar pagamento");
   }
 });
 
-app.get("/", (req,res)=>{
-  res.send("Servidor Mercado Pago funcionando!");
+app.get("/", (req, res) => {
+  res.send("Servidor Mercado Pago rodando 🚀");
 });
 
-app.listen(3000, () => console.log("Servidor rodando"));
+app.listen(3000, () => console.log("Servidor rodando na porta 3000"));
