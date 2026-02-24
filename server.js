@@ -55,9 +55,12 @@ app.post("/create_preference", async (req, res) => {
       payer: payer || undefined,
 
       // (opcional) URLs de retorno
-      back_urls: back_urls || undefined,
-      auto_return: "approved",
-
+    back_urls: {
+  success: "https://espetinhosousa-rgb.github.io/",
+  failure: "https://espetinhosousa-rgb.github.io/",
+  pending: "https://espetinhosousa-rgb.github.io/"
+},
+auto_return: "approved",
       // (opcional) para identificar o pedido
       external_reference: external_reference || undefined,
     };
