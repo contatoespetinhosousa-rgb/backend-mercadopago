@@ -31,6 +31,7 @@ app.post("/create_preference", async (req, res) => {
 
     res.json({
       id: response.id,
+      init_point: response.init_point
     });
   } catch (error) {
     console.log(error);
