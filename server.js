@@ -35,22 +35,32 @@ app.get("/ping", (req, res) => {
 // ✅ Criar preferência (AQUI vai o valor certo do pedido)
 app.post("/create_preference", async (req, res) => {
   try {
-    const { items, payer, back_urls, external_reference } = req.body || {};
-
+    const { items, payer, back_urls, external_reference, deliveryFee } = req.body || {};
     // ✅ validações básicas
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Items inválidos ou vazios." });
     }
+// 👉 cria lista de itens que vieram do site
+const itemsList = items.map((it) => ({
+  title: String(it.title || it.name || "Item"),
+  quantity: Number(it.quantity || 1),
+  unit_price: Number(it.unit_price || 0),
+  currency_id: "BRL",
+}));
 
+// 👉 adiciona taxa de entrega como item do Mercado Pago
+const fee = Number(deliveryFee || 0);
+if (fee > 0) {
+  itemsList.push({
+    title: "Taxa de entrega",
+    quantity: 1,
+    unit_price: fee,
+    currency_id: "BRL",
+  });
+}
     // ✅ monta body da preferência com os itens que vieram do site (total real)
     const body = {
-      items: items.map((it) => ({
-        title: String(it.title || "Item"),
-        quantity: Number(it.quantity || 1),
-        unit_price: Number(it.unit_price || 0),
-        currency_id: "BRL",
-      })),
-
+    items: itemsList,   
       // (opcional) dados do cliente
       payer: payer || undefined,
 
